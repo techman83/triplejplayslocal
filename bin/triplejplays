@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+use v5.010;
+use strict;
+use warnings;
+use App::TriplejPlaysLocal;
+use Getopt::Long;
+use File::Spec;
+use File::Basename 'fileparse';
+use Data::Dumper;
+
+# PODNAME: triplejplays
+
+# ABSTRACT: triplejplays - launch script
+
+# VERSION
+
+=head1 SYNOPSIS
+
+Usage:
+
+    triplejplays                              : Configure Oauth2 authentication
+
+    Debugging commands:
+    
+    triplejplays --version                    : Show version information
+
+=head2 API Registration
+
+You will need to register for a Client Secret + Access token here:
+https://apps.twitter.com/
+
+Set the authorization callback domain to: http://127.0.0.1
+
+=head2 Configuration
+
+You will need the following
+
+  consumer_key=xxxxxxxxxxxx
+  consumer_secret=xxxxxxxxxxxxx
+  access_token=xxxxxxxxxxxxxxxxxx
+  access_token_secret=xxxxxxxxxxxxx
+
+=head1 DESCRIPTION
+
+This a simple tweet time shifter for @triplejplays
+
+=head1 BUGS/Features Requests
+
+Please submit any bugs, feature requests to
+L<https://github.com/techamn83/triplejplayslocal/issues> .
+
+Contributions are more than welcome!
+
+=cut
+
+# $progname is just a nicer-formatted version of $0 (our command name)
+my $PROGNAME = (File::Spec->splitpath($0))[2];
+$PROGNAME ||= 'strava';
+
+my $playslocal = App::TriplejPlaysLocal->new();
+
+my $getopts_rc = GetOptions(
+  "version"     => \&version,
+
+  "help|?"        => \&print_usage,
+);
+
+sub print_usage {
+  say q{
+  Usage:
+
+  triplejplays                            : Run triplejplays
+
+  Debugging commands:
+  
+  triplejplays --version                  : Show version information
+
+  For more documentation, use `perldoc triplejplays`.
+  };
+
+  exit 1;
+}
+
+$playslocal->run;
