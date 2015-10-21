@@ -72,7 +72,21 @@ my $read_tweets = AE::timer 30, 60, sub {
 		say $amount;
 		my $status = $tweets[$tweet_idx];
 		say Dumper($status);
-		$nt->update("$status->{artist} - $status->{track} [$status->{time}]");
+                
+                # Lets comply with the twitter rules!
+                my $artist;
+                if ( $status->{artist} =~ m/@(?<screen_name>.+)/ ) {
+                  # It'd be great to grab full name from Twitter
+                  #$artist = $nt->lookup_users({ screen_name => $+{screen_name} });
+                  $artist = $+{screen_name};
+                } else {
+                  $artist = $status->{artist};
+                }
+
+                # Use better encoding/decoding
+                $artist =~ s/&amp;/&/;
+                 
+		$nt->update("$artist - $status->{track} [$status->{time}]");
 		splice @tweets, $tweet_idx, 1;
 		$amount = @tweets;
 		say $amount;
