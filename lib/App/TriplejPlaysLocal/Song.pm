@@ -28,9 +28,9 @@ A Tweet.
 
 has 'id'      => ( is => 'ro', required => 1 );
 has 'tweet'   => ( is => 'ro', required => 1 );
-has 'artist'  => ( is => 'rw', lazy => 1, builder => 1 );
-has 'track'   => ( is => 'rw', lazy => 1, builder => 1 );
-has 'time'    => ( is => 'rw', lazy => 1, builder => 1 );
+has 'artist'  => ( is => 'ro', lazy => 1, builder => 1 );
+has 'track'   => ( is => 'ro', lazy => 1, builder => 1 );
+has 'time'    => ( is => 'ro', lazy => 1, builder => 1 );
 
 method _build_time {
   $self->tweet =~ m{\[(?<time>\d+:\d+)\]$}x;
