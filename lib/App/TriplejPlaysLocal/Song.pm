@@ -28,18 +28,23 @@ A Tweet.
 
 has 'id'      => ( is => 'ro', required => 1 );
 has 'tweet'   => ( is => 'ro', required => 1 );
-has 'artist'  => ( is => 'rw', lazy => 1, builder => '_parse_tweet' );
-has 'track'   => ( is => 'rw', lazy => 1, builder => '_parse_tweet' );
-has 'time'    => ( is => 'rw', lazy => 1, builder => '_parse_tweet' );
+has 'artist'  => ( is => 'rw', lazy => 1, builder => 1 );
+has 'track'   => ( is => 'rw', lazy => 1, builder => 1 );
+has 'time'    => ( is => 'rw', lazy => 1, builder => 1 );
 
-method _parse_tweet {
-  $self->tweet =~ m{^(?<artist>.+)\s-\s(?<track>.+).\[(?<time>.+)\]$}x;
-  $self->track($+{track});
-  $self->time($+{'time'});
-  $self->artist($self->_parse_artist($+{artist}));
+method _build_time {
+  $self->tweet =~ m{\[(?<time>\d+:\d+)\]$}x;
+  return $+{'time'};
 }
 
-method _parse_artist($artist) {
+method _build_track {
+  $self->tweet =~ m{\s-\s(?<track>.+).\[}x;
+  return $+{track};
+}
+
+method _build_artist {
+  $self->tweet =~ m{^(?<artist>.+)\s-}x;
+  my $artist = $+{artist};
   if ( $artist =~ m/@(?<screen_name>.+)/ ) {
     # It'd be great to grab full name from Twitter
     #$artist = $nt->lookup_users({ screen_name => $+{screen_name} });
