@@ -38,21 +38,26 @@ method _build__tweets {
   return App::TriplejPlaysLocal::Tweets->new();
 }
 
-method run {
-  $self->get_tweets;
-  $self->check_tweets;
-}
-
 method get_tweets {
   $self->_twitter->get_tweets;
 }
 
 method check_tweets {
   my $index = $self->_tweets->check_time;
-  say $index;
   if ($index != -1) {
-    say $self->_tweets->get($index)->build_tweet;
+    # Log Things!
+    my $tweet = $self->_tweets->get_tweet($index)->build_tweet;
+    say "Tweeting: $tweet";
+    $self->_twitter->tweet($tweet);
+    $self->_tweets->delete_tweet($index);
   }
+}
+
+method run {
+  my $get_tweets = AE::timer 0, 60, sub { $self->get_tweets; };
+  my $check_tweets = AE::timer 30, 60, sub { $self->check_tweets; };
+  # Write a loop to run periodically to clean out old tweets.
+  EV::loop;
 }
 
 1;

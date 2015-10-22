@@ -37,12 +37,8 @@ has 'songs' => (
 );
 
 method check_time {
-#  my $time = strftime("%H:%M", localtime(time));
-  my $time = "01:52";
-  # Something a little odd occuring here
-  return $self->check_tweets(sub { 
-    print $_->time."\n";
-    $_->time eq $time });
+  my $time = strftime("%H:%M", localtime(time));
+  return $self->check_tweets(sub { $_->time eq $time });
 }
 
 1;

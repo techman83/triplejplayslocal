@@ -62,7 +62,7 @@ method get_tweets {
   } catch {
     #log this
     #warn "caught error: $_"; # not $@
-    print Dumper($_);
+    say Dumper($_);
     say "Error getting tweets";
   };
   
@@ -83,8 +83,9 @@ method get_tweets {
 
 method tweet($tweet_text) {
   try {
-    say $tweet_text;
+    $self->_twitter->update($tweet_text);
   } catch {
+    say Dumper($_);
     say "Error tweeting";
   }
 }
