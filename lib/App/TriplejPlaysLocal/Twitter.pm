@@ -28,6 +28,8 @@ Twitter Shortcuts.
 
 =cut
 
+our $DEBUG = $ENV{TRIPLEJ_DEBUG} || 0;
+
 my $Ref = sub {
     croak("auth isn't a 'App::TriplejPlaysLocal::Tweets' object!") 
       unless $_[0]->DOES("App::TriplejPlaysLocal::Tweets");
@@ -60,18 +62,18 @@ method get_tweets {
     $timeline->{since_id} = $self->_since_id if $self->_since_id;
     $statuses = $self->_twitter->user_timeline($timeline);
   } catch {
-    #log this
-    #warn "caught error: $_"; # not $@
-    say Dumper($_);
-    say "Error getting tweets";
+    $self->debug($_) if $DEBUG;
+    $self->error("Error getting tweets");
   };
   
   my $id = undef;
   for my $status ( @$statuses ) {
     if (! $id ) {
+      $self->debug("Setting since_id to: $status->{id}");
       $id = $status->{id};
       $self->_since_id($id);
     }
+    $self->info("Adding Tweet: ($status->{id}) $status->{text}");
     $self->tweets->push_val(
       App::TriplejPlaysLocal::Song->new(
         id    => $status->{id},
@@ -85,9 +87,11 @@ method tweet($tweet_text) {
   try {
     $self->_twitter->update($tweet_text);
   } catch {
-    say Dumper($_);
-    say "Error tweeting";
+    $self->debug($_) if $DEBUG;
+    $self->error("Error tweeting");
   }
 }
+
+with('App::TriplejPlaysLocal::Logger');
 
 1;

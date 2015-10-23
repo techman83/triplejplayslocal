@@ -25,6 +25,8 @@ Main App!
 
 =cut
 
+our $DEBUG = $ENV{TRIPLEJ_DEBUG} || 0;
+
 has '_tweets'   => ( is => 'rw', lazy => 1, builder => 1 );
 has '_twitter'  => ( is => 'rw', lazy => 1, builder => 1 );
 
@@ -39,16 +41,17 @@ method _build__tweets {
 }
 
 method get_tweets {
+  $self->debug("Getting tweets");
   $self->_twitter->get_tweets;
 }
 
 method check_tweets {
+  $self->debug("Checking Tweets");
   my $index = $self->_tweets->check_time;
   if ($index != -1) {
-    # Log Things!
     my $tweet = $self->_tweets->get_tweet($index)->build_tweet;
-    say "Tweeting: $tweet";
-    $self->_twitter->tweet($tweet);
+    $self->info("Tweeting: $tweet");
+    $self->_twitter->tweet($tweet) unless $DEBUG;
     $self->_tweets->delete_tweet($index);
   }
 }
@@ -59,5 +62,7 @@ method run {
   # Write a loop to run periodically to clean out old tweets.
   EV::loop;
 }
+
+with('App::TriplejPlaysLocal::Logger');
 
 1;
