@@ -55,7 +55,7 @@ Contributions are more than welcome!
 
 # $progname is just a nicer-formatted version of $0 (our command name)
 my $PROGNAME = (File::Spec->splitpath($0))[2];
-$PROGNAME ||= 'strava';
+$PROGNAME ||= 'triplejplays';
 
 my $playslocal = App::TriplejPlaysLocal->new();
 
@@ -78,6 +78,13 @@ sub print_usage {
   For more documentation, use `perldoc triplejplays`.
   };
 
+  exit 1;
+}
+
+sub version {
+  $::VERSION ||= "Unreleased";
+  say "triplejplays version               : $::VERSION";
+  say "App::TriplejPlaysLocal version     : ", $playslocal->VERSION;
   exit 1;
 }
 
