@@ -4,7 +4,7 @@ A simple Triple J plays Time Shifter
 
 Installation
 ============
-I personally remommend using cpanminus + local::lib.
+I personally recommend using cpanminus + local::lib.
 
 Grab cpanm + local::lib
 ```bash
