@@ -57,7 +57,7 @@ method check_tweets {
 }
 
 method run {
-  my $get_tweets = AE::timer 0, 60, sub { $self->get_tweets; };
+  my $get_tweets = AE::timer 0, 600, sub { $self->get_tweets; };
   my $check_tweets = AE::timer 30, 60, sub { $self->check_tweets; };
   # Write a loop to run periodically to clean out old tweets.
   EV::loop;
