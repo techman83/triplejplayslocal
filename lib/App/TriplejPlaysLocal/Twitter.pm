@@ -40,7 +40,7 @@ has '_since_id'  => ( is => 'rw', default => sub { undef } );
 
 
 method _build__config {
-  return Config::Tiny->read( $ENV{HOME}."/.triplejplayswa" );
+  return Config::Tiny->read( $ENV{HOME}."/.triplejplays" );
 } 
 
 method _build__twitter {
