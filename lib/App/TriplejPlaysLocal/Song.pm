@@ -28,30 +28,30 @@ A Tweet.
 
 has 'id'      => ( is => 'ro', required => 1 );
 has 'tweet'   => ( is => 'ro', required => 1 );
+has '_tweet'  => ( is => 'ro', lazy => 1, builder => 1 );
 has 'artist'  => ( is => 'ro', lazy => 1, builder => 1 );
 has 'track'   => ( is => 'ro', lazy => 1, builder => 1 );
 has 'time'    => ( is => 'ro', lazy => 1, builder => 1 );
 
+method _build__tweet {
+  my $tweet = $self->{tweet};
+  $tweet =~ s/\@(\w+)/$1/g;
+  return $tweet;
+}
+
 method _build_time {
-  $self->tweet =~ m{\[(?<time>\d+:\d+)\]$}x;
+  $self->_tweet =~ m{\[(?<time>\d+:\d+)\]$}x;
   return $+{'time'};
 }
 
 method _build_track {
-  $self->tweet =~ m{\s-\s(?<track>.+).\[}x;
+  $self->_tweet =~ m{\s-\s(?<track>.+).\[}x;
   return $+{track};
 }
 
 method _build_artist {
-  $self->tweet =~ m{^(?<artist>.+)\s-}x;
-  my $artist = $+{artist};
-  if ( $artist =~ m/@(?<screen_name>.+)/ ) {
-    # It'd be great to grab full name from Twitter
-    #$artist = $nt->lookup_users({ screen_name => $+{screen_name} });
-    return $+{screen_name};
-  } else {
-    return $artist;
-  }
+  $self->_tweet =~ m{^\.?(?<artist>.+)\s-}x;
+  return $+{artist};
 }
 
 method build_tweet {
