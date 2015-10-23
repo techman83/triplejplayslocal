@@ -35,7 +35,12 @@ has 'time'    => ( is => 'ro', lazy => 1, builder => 1 );
 
 method _build__tweet {
   my $tweet = $self->{tweet};
+
+  # Clean out @mentions
   $tweet =~ s/\@(\w+)/$1/g;
+
+  # this is really lazy, should do like proper decoding stuffs..
+  $tweet =~ s/&amp;/&/g;
   return $tweet;
 }
 
