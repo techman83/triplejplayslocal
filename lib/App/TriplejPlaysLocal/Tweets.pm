@@ -14,9 +14,9 @@ use namespace::clean;
 
 =head1 SYNOPSIS
 
-    use App::TriplejPlaysLocal::Twitter;
+    use App::TriplejPlaysLocal::Tweets;
 
-    my $twitter = App::TriplejPlaysLocal::Twitter->new();
+    my $tweets = App::TriplejPlaysLocal::Tweets->new();
 
 =head1 DESCRIPTION
 
@@ -35,6 +35,15 @@ has 'songs' => (
   },
   default     => sub { [ ] },
 );
+
+=method check_time
+
+  $my $index = $tweets->check_time;
+
+If there is a tweet for the current minute it will return the index
+or '-1' if none found.
+
+=cut
 
 method check_time {
   my $time = strftime("%H:%M", localtime(time));
