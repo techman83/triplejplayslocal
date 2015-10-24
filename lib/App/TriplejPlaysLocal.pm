@@ -18,10 +18,13 @@ use namespace::clean;
     use App::TriplejPlaysLocal;
 
     my $plays = App::TriplejPlaysLocal->new();
+    
+    $plays->run;
 
 =head1 DESCRIPTION
 
-Main App!
+This ties the TriplejPlaysLocal app together. Calling '->run' will 
+cause it to get/tweet periodically until terminated.
 
 =cut
 
@@ -40,10 +43,27 @@ method _build__tweets {
   return App::TriplejPlaysLocal::Tweets->new();
 }
 
+=method get_tweets
+
+  $plays->get_tweets;
+
+Calls the Twitter object to fetch tweets from @triplejplays.
+
+=cut
+
 method get_tweets {
   $self->debug("Getting tweets");
   $self->_twitter->get_tweets;
 }
+
+=method check_tweets
+
+  $plays->check_tweets;
+
+Checks if there is a song for the current minutes and tweets it. 
+After which it will delete the song from the tweets object.
+
+=cut
 
 method check_tweets {
   $self->debug("Checking Tweets");
@@ -55,6 +75,15 @@ method check_tweets {
     $self->_tweets->delete_tweet($index);
   }
 }
+
+=method run
+
+  $plays->run;
+
+Sets up the AnyEvent timers to get new tweets every 10 minutes and 
+check if there is a song to tweet every minute.
+
+=cut
 
 method run {
   my $get_tweets = AE::timer 0, 600, sub { $self->get_tweets; };
