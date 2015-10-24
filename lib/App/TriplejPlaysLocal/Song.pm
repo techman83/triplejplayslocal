@@ -22,7 +22,8 @@ use namespace::clean;
 
 =head1 DESCRIPTION
 
-A Tweet.
+This is a song object, essentially to give simple shortcut methods 
+for tweeting out a status with the correct details.
 
 =cut
 
@@ -58,6 +59,17 @@ method _build_artist {
   $self->_tweet =~ m{^\.?(?<artist>.+)\s-}x;
   return $+{artist};
 }
+
+=method build_tweet
+
+  my $tweet = $song->build_tweet;
+
+Returns a pre-formated tweet in the style of @triplejplays, with the 
+'@mentions' stripped to avoid breaking the twitter automation rules.
+
+Eg. 'Artist - Track [00:00]'
+
+=cut
 
 method build_tweet {
   return $self->artist." - ".$self->track." [".$self->time."]";
