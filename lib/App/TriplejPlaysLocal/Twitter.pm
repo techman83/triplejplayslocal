@@ -20,11 +20,12 @@ use namespace::clean;
 
     use App::TriplejPlaysLocal::Twitter;
 
-    my $twitter = App::TriplejPlaysLocal::Twitter->new();
+    my $twitter = App::TriplejPlaysLocal::Twitter->new( tweets => $tweets );
 
 =head1 DESCRIPTION
 
-Twitter Shortcuts.
+Twitter Shortcuts. Requires a 'App::TriplejPlaysLocal::Tweets' object 
+for storage of retrieved tweets.
 
 =cut
 
@@ -53,7 +54,17 @@ method _build__twitter {
     access_token_secret => $self->_config->{_}{access_token_secret},
     ssl                 => 1,
   );
-} 
+}
+
+=method get_tweets
+
+  $twitter->get_tweets;
+
+Checks 'triplejplays' for the last 50 tweets or up to the last
+50 tweets from the 'since_id' if populated and pushes them into 
+the 'App::TriplejPlaysLocal::Tweets' object.
+
+=cut
 
 method get_tweets {
   my $statuses;
@@ -82,6 +93,14 @@ method get_tweets {
     );
   }
 }
+
+=method tweet
+
+  $twitter->tweet("Status here");
+
+Sends a tweet from the configured account.
+
+=cut
 
 method tweet($tweet_text) {
   try {
