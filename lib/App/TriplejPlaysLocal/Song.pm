@@ -64,7 +64,7 @@ method _build_artist {
 
   my $tweet = $song->build_tweet;
 
-Returns a pre-formated tweet in the style of @triplejplays, with the 
+Returns a pre-formatted tweet in the style of @triplejplays, with the 
 '@mentions' stripped to avoid breaking the twitter automation rules.
 
 Eg. 'Artist - Track [00:00]'
