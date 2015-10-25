@@ -48,15 +48,16 @@ Usage
 Once installed and with the config file created, just launch it.
 ```
 $ triplejplays 
-Tweeting: icecube - It Was A Good Day [10:23]
+$ tail ~/triplejplays.log -f
+2015/10/25 10:56:33 INFO Tweeting: madeon - Imperium [10:56] 
+2015/10/25 11:03:04 INFO Adding Tweet: (658114817564278784) .@vallisalps - Young [13:55] 
+2015/10/25 11:03:04 INFO Adding Tweet: (658114323198418944) .@TheHardAches - Loser [13:53] 
 ```
 
-It will tweet based on the current local time of the running profile.
-Currently writes to stdout, but likely will set it to log to a file 
-and daemonize rather than running in the foreground.
+It will tweet based on the current local time of the running profile. 
+Does not account for live national broadcasts.
 
 Author + License
 ================
 Leon Wright < techman@cpan.org >
 License: Perl_5
-
