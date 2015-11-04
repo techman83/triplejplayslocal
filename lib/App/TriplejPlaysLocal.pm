@@ -76,6 +76,25 @@ method check_tweets {
   }
 }
 
+=method expire_tweets
+
+  $plays->expire_tweets;
+
+Checks if there are any tweets older than 21600 seconds (5 hours) and
+purges them.
+
+=cut
+
+method expire_tweets {
+  $self->debug("Expiring Tweets");
+  my @expired = $self->_tweets->expired_tweets;
+  foreach my $index (@expired) {
+    my $tweet = $self->_tweets->get_tweet($index)->build_tweet;
+    $self->info("Expiring: $tweet");
+    $self->_tweets->delete_tweet($index);
+  }
+}
+
 =method run
 
   $plays->run;
@@ -87,8 +106,8 @@ check if there is a song to tweet every minute.
 
 method run {
   my $get_tweets = AE::timer 0, 600, sub { $self->get_tweets; };
+  my $expire_tweets = AE::timer 15, 3600, sub { $self->expire_tweets; };
   my $check_tweets = AE::timer 30, 60, sub { $self->check_tweets; };
-  # Write a loop to run periodically to clean out old tweets.
   EV::loop;
 }
 
