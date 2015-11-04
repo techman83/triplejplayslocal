@@ -27,12 +27,13 @@ for tweeting out a status with the correct details.
 
 =cut
 
-has 'id'      => ( is => 'ro', required => 1 );
-has 'tweet'   => ( is => 'ro', required => 1 );
-has '_tweet'  => ( is => 'ro', lazy => 1, builder => 1 );
-has 'artist'  => ( is => 'ro', lazy => 1, builder => 1 );
-has 'track'   => ( is => 'ro', lazy => 1, builder => 1 );
-has 'time'    => ( is => 'ro', lazy => 1, builder => 1 );
+has 'id'        => ( is => 'ro', required => 1 );
+has 'tweet'     => ( is => 'ro', required => 1 );
+has '_tweet'    => ( is => 'ro', lazy => 1, builder => 1 );
+has 'artist'    => ( is => 'ro', lazy => 1, builder => 1 );
+has 'track'     => ( is => 'ro', lazy => 1, builder => 1 );
+has 'time'      => ( is => 'ro', lazy => 1, builder => 1 );
+has 'timestamp' => ( is => 'ro', default => sub { time } );
 
 method _build__tweet {
   my $tweet = $self->{tweet};
