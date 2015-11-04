@@ -1,9 +1,11 @@
 package App::TriplejPlaysLocal::Tweets;
 
+use v5.010;
 use autodie;
 use Carp qw(croak);
 use Method::Signatures 20140224;
 use POSIX qw(strftime);
+use List::MoreUtils 'indexes';
 use Moo;
 use MooX::HandlesVia;
 use namespace::clean;
@@ -38,7 +40,7 @@ has 'songs' => (
 
 =method check_time
 
-  $my $index = $tweets->check_time;
+  my $index = $tweets->check_time;
 
 If there is a tweet for the current minute it will return the index
 or '-1' if none found.
@@ -48,6 +50,19 @@ or '-1' if none found.
 method check_time {
   my $time = strftime("%H:%M", localtime(time));
   return $self->check_tweets(sub { $_->time eq $time });
+}
+
+=method expired_tweets
+
+  my @indexes = $tweets->expired_tweets;
+
+Returns an array of tweet indexes that are older than 21600 seconds 
+(5 hours).
+
+=cut
+
+method expired_tweets {
+  return indexes { $_->timestamp + 21600 < time  } @{$self->songs};
 }
 
 1;
