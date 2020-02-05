@@ -7,8 +7,6 @@ use Method::Signatures;
 use Try::Tiny;
 use Net::Twitter::Lite::WithAPIv1_1;
 use App::TriplejPlaysLocal::Song;
-use Config::Tiny;
-use Data::Dumper;
 use Moo;
 use namespace::clean;
 
@@ -37,21 +35,16 @@ my $Ref = sub {
 };
 
 has 'tweets'    => ( is => 'rw', required => 1, isa => $Ref );
-has '_config'   => ( is => 'ro', lazy => 1, builder => 1 );
 has '_twitter'  => ( is => 'ro', lazy => 1, builder => 1 );
 has '_since_id'  => ( is => 'rw', default => sub { undef } );
 
 
-method _build__config {
-  return Config::Tiny->read( $ENV{HOME}."/.triplejplays" );
-} 
-
 method _build__twitter {
   return Net::Twitter::Lite::WithAPIv1_1->new(
-    consumer_key        => $self->_config->{_}{consumer_key},
-    consumer_secret     => $self->_config->{_}{consumer_secret},
-    access_token        => $self->_config->{_}{access_token},
-    access_token_secret => $self->_config->{_}{access_token_secret},
+    consumer_key        => $ENV{TRIPLEJ_CONSUMER_KEY},
+    consumer_secret     => $ENV{TRIPLEJ_CONSUMER_SECRET},
+    access_token        => $ENV{TRIPLEJ_ACCESS_TOKEN},
+    access_token_secret => $ENV{TRIPLEJ_ACCESS_TOKEN_SECRET},
     ssl                 => 1,
   );
 }

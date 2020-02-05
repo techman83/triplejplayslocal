@@ -50,20 +50,14 @@ method _build_log_config() {
     log4perl.appender.SCREEN.stderr  = 0
     log4perl.appender.SCREEN.layout  = Log::Log4perl::Layout::PatternLayout
     log4perl.appender.SCREEN.layout.ConversionPattern = %m %n
-    log4perl.appender.LOG1           = Log::Log4perl::Appender::File
-    log4perl.appender.LOG1.utf8      = 1
-    log4perl.appender.LOG1.filename  = $ENV{HOME}/triplejplays.log
-    log4perl.appender.LOG1.mode      = append
-    log4perl.appender.LOG1.layout    = Log::Log4perl::Layout::PatternLayout
-    log4perl.appender.LOG1.layout.ConversionPattern = %d %p %m %n
   );
 }
 
 method _build__log_level {
   if ( ! $DEBUG ) {
-    return "INFO, LOG1";
+    return "INFO, SCREEN";
   } else {
-    return "DEBUG, LOG1, SCREEN";
+    return "DEBUG, SCREEN";
   }
 }
 
