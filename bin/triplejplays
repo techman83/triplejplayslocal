@@ -89,4 +89,7 @@ sub version {
   exit 1;
 }
 
+# Make STDOUT unbuffered
+select STDOUT; $| = 1;
+
 $playslocal->run;
