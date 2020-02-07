@@ -49,7 +49,7 @@ method _build_log_config() {
     log4perl.appender.SCREEN         = Log::Log4perl::Appender::Screen
     log4perl.appender.SCREEN.stderr  = 0
     log4perl.appender.SCREEN.layout  = Log::Log4perl::Layout::PatternLayout
-    log4perl.appender.SCREEN.layout.ConversionPattern = %m %n
+    log4perl.appender.SCREEN.layout.ConversionPattern = %d %p %m %n
   );
 }
 
