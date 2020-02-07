@@ -4,20 +4,20 @@ from troposphere import Sub, Ref, Template
 from troposphere.ecs import (
     Cluster, Service, TaskDefinition,
     ContainerDefinition, NetworkConfiguration,
-    AwsvpcConfiguration, PortMapping, LogConfiguration,
-    Secret
+    AwsvpcConfiguration, LogConfiguration, Secret,
+    Environment
 )
 from troposphere.iam import Role, Policy
 from troposphere.logs import LogGroup
 
-SUBNET = os.getenv('TRIPLEJPLAYS_SUBNET')
-PARAM_NAMESPACE = os.getenv('TRIPLEJPLAYS_NS')
+SUBNETS = os.getenv('TRIPLEJPLAYS_SUBNETS').split(' ')
+PARAM_NAMESPACE = '/triplejplays_wa/'
 
 t = Template()
 t.add_version('2010-09-09')
 
 ecs_role = t.add_resource(Role(
-    'TripleJPlaysEcsRole',
+    'TripleJPlaysExecutionRole',
     AssumeRolePolicyDocument={
         "Version": "2012-10-17",
         "Statement": [
@@ -56,18 +56,21 @@ ecs_role = t.add_resource(Role(
                 ]
             }
         )
-    ]
+    ],
+    ManagedPolicyArns=[
+        "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+    ],
 ))
 
 cluster = t.add_resource(Cluster(
     'TripleJPlaysCluster'
 ))
 
-container_logs = LogGroup(
+t.add_resource(LogGroup(
     'TripleJPlaysLogs',
     LogGroupName='/ecs/triplejplays',
     RetentionInDays=14,
-)
+))
 
 task_definition = t.add_resource(TaskDefinition(
     'TripleJPlaysTask',
@@ -108,9 +111,9 @@ task_definition = t.add_resource(TaskDefinition(
                     'awslogs-group': '/ecs/triplejplays',
                     'awslogs-region': 'us-west-2',
                     'awslogs-stream-prefix': 'wa'
-                }  
+                }
             )
-        )
+        ),
     ]
 ))
 
@@ -122,7 +125,8 @@ service = t.add_resource(Service(
     LaunchType='FARGATE',
     NetworkConfiguration=NetworkConfiguration(
         AwsvpcConfiguration=AwsvpcConfiguration(
-            Subnets=[SUBNET]
+            AssignPublicIp="ENABLED",
+            Subnets=SUBNETS
         )
     )
 ))

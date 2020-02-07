@@ -1,9 +1,9 @@
 FROM perl:5 as build
 ADD . /tmp/triplejplays
 WORKDIR /tmp/triplejplays
-RUN cpanm Dist::Zilla
-RUN dzil authordeps | cpanm
-RUN dzil listdeps   | cpanm
+RUN cpanm Dist::Zilla --notest && \
+    dzil authordeps | cpanm --notest && \
+    dzil listdeps   | cpanm --notest
 RUN dzil test
 RUN dzil build
 
