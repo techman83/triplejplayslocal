@@ -5,7 +5,7 @@ use 5.010;
 use Carp qw(croak);
 use Method::Signatures;
 use Try::Tiny;
-use Net::Twitter::Lite::WithAPIv1_1;
+use Twitter::API;
 use App::TriplejPlaysLocal::Song;
 use Moo;
 use namespace::clean;
@@ -38,14 +38,20 @@ has 'tweets'    => ( is => 'rw', required => 1, isa => $Ref );
 has '_twitter'  => ( is => 'ro', lazy => 1, builder => 1 );
 has '_since_id'  => ( is => 'rw', default => sub { undef } );
 
+method _get_env($env_var) {
+  if (! $ENV{$env_var}) {
+    $self->error("$env_var not populated");
+  }
+  return $ENV{$env_var};
+}
 
 method _build__twitter {
-  return Net::Twitter::Lite::WithAPIv1_1->new(
-    consumer_key        => $ENV{TRIPLEJ_CONSUMER_KEY},
-    consumer_secret     => $ENV{TRIPLEJ_CONSUMER_SECRET},
-    access_token        => $ENV{TRIPLEJ_ACCESS_TOKEN},
-    access_token_secret => $ENV{TRIPLEJ_ACCESS_TOKEN_SECRET},
-    ssl                 => 1,
+  return Twitter::API->new_with_traits(
+    traits              => [ qw/ApiMethods RetryOnError/ ],
+    consumer_key        => $self->_get_env("TRIPLEJ_CONSUMER_KEY"),
+    consumer_secret     => $self->_get_env("TRIPLEJ_CONSUMER_SECRET"),
+    access_token        => $self->_get_env("TRIPLEJ_ACCESS_TOKEN"),
+    access_token_secret => $self->_get_env("TRIPLEJ_ACCESS_TOKEN_SECRET"),
   );
 }
 
@@ -69,7 +75,7 @@ method get_tweets {
     $self->debug($_) if $DEBUG;
     $self->error("Error getting tweets");
   };
-  
+
   my $id = undef;
   for my $status ( @$statuses ) {
     if (! $id ) {
