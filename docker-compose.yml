@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  triplej:
+    build:
+      context: .
+      target: production
+    environment:
+      TRIPLEJ_CONSUMER_KEY: ${TRIPLEJ_CONSUMER_KEY}
+      TRIPLEJ_CONSUMER_SECRET: ${TRIPLEJ_CONSUMER_SECRET}
+      TRIPLEJ_ACCESS_TOKEN: ${TRIPLEJ_ACCESS_TOKEN}
+      TRIPLEJ_ACCESS_TOKEN_SECRET: ${TRIPLEJ_ACCESS_TOKEN_SECRET}
+      TRIPLEJ_DEBUG: 1
+      TRIPLEJ_DRYRUN: 1
+      TZ: Australia/Adelaide

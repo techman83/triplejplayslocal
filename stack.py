@@ -11,7 +11,7 @@ from troposphere.iam import Role, Policy
 from troposphere.logs import LogGroup
 
 SUBNETS = os.getenv('TRIPLEJPLAYS_SUBNETS').split(' ')
-PARAM_NAMESPACE = '/triplejplays_wa/'
+PARAM_NAMESPACE = '/triplejplays/'
 
 t = Template()
 t.add_version('2010-09-09')
@@ -72,7 +72,7 @@ t.add_resource(LogGroup(
     RetentionInDays=14,
 ))
 
-task_definition = t.add_resource(TaskDefinition(
+task_definition = TaskDefinition(
     'TripleJPlaysTask',
     RequiresCompatibilities=['FARGATE'],
     Cpu='256',
@@ -80,28 +80,43 @@ task_definition = t.add_resource(TaskDefinition(
     NetworkMode='awsvpc',
     Family=Sub('${AWS::StackName}${name}', name='TripleJPlays'),
     ExecutionRoleArn=Ref(ecs_role),
-    ContainerDefinitions=[
+    ContainerDefinitions=[]
+)
+
+timezones = [
+    {'location': 'wa', 'tz': 'Australia/Perth'},
+    {'location': 'sa', 'tz': 'Australia/Adelaide'},
+]
+
+for timezone in timezones:
+    location = timezone['location']
+    task_definition.ContainerDefinitions.append(
         ContainerDefinition(
-            Name='TripleJPlaysWA',
+            Name='TripleJPlays{}'.format(location.upper()),
             Image=Sub(
                 '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/triplejplayswa',
             ),
+            Environment=[
+                Environment(
+                    Name='TZ', Value=timezone['tz']
+                )
+            ],
             Secrets=[
                 Secret(
                     Name='TRIPLEJ_CONSUMER_KEY',
-                    ValueFrom='{}consumer_key'.format(PARAM_NAMESPACE)
+                    ValueFrom='{}{}/consumer_key'.format(PARAM_NAMESPACE, location)
                 ),
                 Secret(
                     Name='TRIPLEJ_CONSUMER_SECRET',
-                    ValueFrom='{}consumer_secret'.format(PARAM_NAMESPACE)
+                    ValueFrom='{}{}/consumer_secret'.format(PARAM_NAMESPACE, location)
                 ),
                 Secret(
                     Name='TRIPLEJ_ACCESS_TOKEN',
-                    ValueFrom='{}access_token'.format(PARAM_NAMESPACE)
+                    ValueFrom='{}{}/access_token'.format(PARAM_NAMESPACE, location)
                 ),
                 Secret(
                     Name='TRIPLEJ_ACCESS_TOKEN_SECRET',
-                    ValueFrom='{}access_token_secret'.format(PARAM_NAMESPACE)
+                    ValueFrom='{}{}/access_token_secret'.format(PARAM_NAMESPACE, location)
                 ),
             ],
             Essential=True,
@@ -110,12 +125,13 @@ task_definition = t.add_resource(TaskDefinition(
                 Options={
                     'awslogs-group': '/ecs/triplejplays',
                     'awslogs-region': 'us-west-2',
-                    'awslogs-stream-prefix': 'wa'
+                    'awslogs-stream-prefix': location
                 }
             )
-        ),
-    ]
-))
+        )
+    )
+
+t.add_resource(task_definition)
 
 service = t.add_resource(Service(
     'TripleJPlaysService',
