@@ -36,6 +36,7 @@ my $Ref = sub {
 
 has 'tweets'    => ( is => 'rw', required => 1, isa => $Ref );
 has '_twitter'  => ( is => 'ro', lazy => 1, builder => 1 );
+has '_dry_run'  => ( is => 'ro', lazy => 1, builder => 1 );
 has '_since_id'  => ( is => 'rw', default => sub { undef } );
 
 method _get_env($env_var) {
@@ -43,6 +44,14 @@ method _get_env($env_var) {
     $self->error("$env_var not populated");
   }
   return $ENV{$env_var};
+}
+
+method _build__dry_run {
+  if ($ENV{TRIPLEJ_DRYRUN}) {
+    $self->info("Dry Run mode enabled");
+    return 1;
+  }
+  return 0;
 }
 
 method _build__twitter {
@@ -102,6 +111,10 @@ Sends a tweet from the configured account.
 =cut
 
 method tweet($tweet_text) {
+  if ($self->_dry_run) {
+    $self->info("Would have tweeted: $tweet_text");
+    return;
+  }
   try {
     $self->_twitter->update($tweet_text);
   } catch {
